@@ -14,31 +14,61 @@ export enum UserRole {
 
 export type UserDocument = HydratedDocument<User>;
 
-@Schema()
+@Schema({ timestamps: true })
 export class User {
-  @Prop()
   _id?: string;
 
-  @Prop()
+  @Prop({
+    required: true,
+    trim: true,
+    minlength: 3,
+    maxlength: 100,
+  })
   name: string;
 
-  @Prop({ unique: true })
+  @Prop({
+    required: true,
+    unique: true,
+    lowercase: true,
+    trim: true,
+    index: true,
+  })
   username: string;
 
-  @Prop()
+  @Prop({
+    trim: true,
+  })
   phone: string;
 
-  @Prop()
+  @Prop({
+    required: true,
+    minlength: 6,
+  })
   password: string;
 
-  @Prop()
+  @Prop({
+    type: String,
+    enum: Object.values(UserRole),
+    required: true,
+    default: UserRole.USER,
+  })
   role: UserRole;
 
-  @Prop()
+  @Prop({
+    type: [String],
+    default: [],
+  })
   poolIds: string[];
 
-  @Prop({ default: UserStatus.INACTIVE })
+  @Prop({
+    type: String,
+    enum: Object.values(UserStatus),
+    default: UserStatus.INACTIVE,
+  })
   status: UserStatus;
+
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

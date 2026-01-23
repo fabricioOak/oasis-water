@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable, Query } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Model } from 'mongoose';
@@ -36,15 +36,15 @@ export class UsersService {
   }
 
   async findAll(
-    @Query() paginationDto: PaginationDto,
+    paginationDto: PaginationDto,
   ): Promise<PaginatedResponse<PublicUser[]>> {
     const { limit = 10, page = 1 } = paginationDto;
     const skip = (page - 1) * limit;
     const [items, count] = await Promise.all([
       this.userModel
         .find()
-        .select('-password') // Exclude password field directly in the query
-        .skip(skip ? skip - 1 : 0)
+        .select('-password')
+        .skip(skip)
         .limit(limit)
         .lean()
         .exec(),
@@ -77,16 +77,28 @@ export class UsersService {
   }
 
   async update(id: string, updateUserDto: UpdateUserDto) {
-    const userToUpdate = await this.userModel.findByIdAndUpdate(
-      id,
-      updateUserDto,
-    );
+    if (updateUserDto.username) {
+      const existingUser = await this.userModel.findOne({
+        username: updateUserDto.username,
+        _id: { $ne: id },
+      });
+
+      if (existingUser) {
+        throw new HttpException('Username already in use', HttpStatus.CONFLICT);
+      }
+    }
+
+    const userToUpdate = await this.userModel
+      .findByIdAndUpdate(id, updateUserDto, { new: true })
+      .select('-password')
+      .lean()
+      .exec();
 
     if (!userToUpdate) {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
 
-    const userWithoutPassword = sanitizeUser(userToUpdate.toObject());
+    const userWithoutPassword = sanitizeUser(userToUpdate);
     return {
       message: 'User updated successfully',
       data: userWithoutPassword,
@@ -94,7 +106,10 @@ export class UsersService {
   }
 
   async remove(id: string) {
-    const userToDelete = await this.userModel.findByIdAndDelete(id);
+    const userToDelete = await this.userModel
+      .findByIdAndDelete(id)
+      .lean()
+      .exec();
 
     if (!userToDelete) {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
