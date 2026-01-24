@@ -40,7 +40,12 @@ export class Pool {
   })
   employees: string[];
 
-  @Prop()
+  @Prop({
+    type: String,
+    enum: Object.values(PoolStatus),
+    required: true,
+    default: PoolStatus.ACTIVE,
+  })
   status: PoolStatus;
 
   createdAt?: Date;
