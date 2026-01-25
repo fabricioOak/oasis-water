@@ -28,7 +28,10 @@ export class RolesGuard implements CanActivate {
     const user = request.user;
 
     if (!user || !requiredRoles.includes(user.role)) {
-      throw new HttpException('insufficient_permissions', HttpStatus.FORBIDDEN);
+      throw new HttpException(
+        'You do not have permission to access this resource.',
+        HttpStatus.FORBIDDEN,
+      );
     }
 
     return true;
