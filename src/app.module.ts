@@ -8,6 +8,7 @@ import { UsersModule } from './src/users/users.module';
 import { PoolModule } from './src/pool/pool.module';
 import { AuthModule } from './src/auth/auth.module';
 import { BookingModule } from './src/booking/booking.module';
+import { ThrottlerModule } from '@nestjs/throttler';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -18,6 +19,14 @@ import { BookingModule } from './src/booking/booking.module';
     MongooseModule.forRoot(
       process.env.MONGO_URI || 'mongodb://localhost:27017',
     ),
+    ThrottlerModule.forRoot({
+      throttlers: [
+        {
+          ttl: 60000,
+          limit: 100,
+        },
+      ],
+    }),
     UsersModule,
     PoolModule,
     AuthModule,
