@@ -3,6 +3,8 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 
+import helmet from 'helmet';
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.useGlobalPipes(
@@ -12,6 +14,7 @@ async function bootstrap() {
       transform: true,
     }),
   );
+  app.use(helmet());
   const swaggerConfig = new DocumentBuilder()
     .setTitle('Pool Manager')
     .setDescription('The Pool Manager API description')
