@@ -65,11 +65,11 @@ export class UsersService {
   }
 
   async findOne(id: string) {
-    const user = await this.userModel.findById(id).exec();
+    const user = await this.userModel.findById(id).lean().exec();
     if (!user) {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
-    const userWithoutPassword = sanitizeUser(user.toObject());
+    const userWithoutPassword = sanitizeUser(user);
     return {
       message: 'User found',
       data: userWithoutPassword,
