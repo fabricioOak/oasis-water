@@ -16,14 +16,15 @@ async function bootstrap() {
   );
   app.use(helmet());
   app.enableCors();
-  const swaggerConfig = new DocumentBuilder()
-    .setTitle('Pool Manager')
-    .setDescription('The Pool Manager API description')
-    .setVersion('1.0')
-    .build();
-  const document = SwaggerModule.createDocument(app, swaggerConfig);
-  SwaggerModule.setup('docs', app, document);
-
+  if (process.env.ENV !== 'production') {
+    const swaggerConfig = new DocumentBuilder()
+      .setTitle('Pool Manager')
+      .setDescription('The Pool Manager API description')
+      .setVersion('1.0')
+      .build();
+    const document = SwaggerModule.createDocument(app, swaggerConfig);
+    SwaggerModule.setup('docs', app, document);
+  }
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();
