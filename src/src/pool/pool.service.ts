@@ -46,6 +46,25 @@ export class PoolService {
     };
   }
 
+  async findByEmployee(employeeId: string) {
+    const pools = await this.poolModel
+      .find({
+        employees: employeeId,
+      })
+      .select('-employees')
+      .lean()
+      .exec();
+
+    const count = pools.length;
+    const message =
+      count > 0 ? 'Pools retrieved' : 'No pools found for this employee';
+
+    return {
+      message,
+      data: pools,
+    };
+  }
+
   async findOne(id: string) {
     const pool = await this.poolModel
       .findById(id)
