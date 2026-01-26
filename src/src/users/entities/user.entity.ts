@@ -7,9 +7,9 @@ export enum UserStatus {
 }
 
 export enum UserRole {
-  ADMIN = 'ADMIN',
-  USER = 'USER',
-  MAINTAINER = 'MAINTAINER',
+  ADMIN = 'ADMIN', // Administrator with full access
+  EMPLOYEE = 'EMPLOYEE', // Employee with limited access
+  GUEST = 'GUEST', // Guest user with minimal access
 }
 
 export type UserDocument = HydratedDocument<User>;
@@ -50,7 +50,7 @@ export class User {
     type: String,
     enum: Object.values(UserRole),
     required: true,
-    default: UserRole.USER,
+    default: UserRole.GUEST,
   })
   role: UserRole;
 

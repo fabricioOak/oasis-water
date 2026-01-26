@@ -36,7 +36,7 @@ export class CreateUserDto {
   @MinLength(6)
   password: string;
 
-  @ApiProperty({ enum: UserRole, example: UserRole.USER })
+  @ApiProperty({ enum: UserRole, example: UserRole.GUEST })
   @IsEnum(UserRole)
   role: UserRole;
 
